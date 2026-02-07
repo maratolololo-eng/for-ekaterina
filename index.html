@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Валентинка 💘</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffb6d5, #ffd6e5);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .card {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 25px;
+      width: 360px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .bear { font-size: 90px; margin-bottom: 5px; }
+    h1 { margin: 10px 0 0; font-size: 26px; color: #d6004c; }
+
+    .buttons {
+      margin-top: 25px;
+      position: relative;
+      height: 130px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 22px;
+      border-radius: 14px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+      user-select: none;
+    }
+
+    #yesBtn {
+      background: #d6004c;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 8px 15px rgba(214, 0, 76, 0.3);
+    }
+
+    #yesBtn:hover { transform: scale(1.06); }
+
+    #noBtn {
+      background: #f1f1f1;
+      color: #222;
+      position: absolute;
+      left: 210px;
+      top: 0px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transform-origin: center;
+    }
+
+    .small { font-size: 12px; color: gray; margin-top: 10px; }
+
+    /* Сердечки */
+    .heart {
+      position: fixed;
+      top: -20px;
+      font-size: 24px;
+      animation: fall 3s linear forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Финальный экран */
+    #finalScreen {
+      display: none;
+    }
+
+    .finalText {
+      font-size: 20px;
+      margin-top: 10px;
+      color: #d6004c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card" id="card">
+
+    <!-- ПЕРВЫЙ ЭКРАН -->
+    <div id="questionScreen">
+      <div class="bear">🐻</div>
+      <h1>Ты будешь моей валентинкой? 💘</h1>
+
+      <div class="buttons" id="buttons">
+        <button id="yesBtn">Да</button>
+        <button id="noBtn">Нет</button>
+      </div>
+
+      <div class="small" id="hint">Не жми “Нет”… 😈</div>
+    </div>
+
+    <!-- ФИНАЛЬНЫЙ ЭКРАН -->
+    <div id="finalScreen">
+      <div class="bear">🐻💘</div>
+      <div class="finalText">УРАААА!</div>
+      <p style="font-size:18px;">Теперь ты моя валентинка 🥰</p>
+      <div style="font-size:45px;">💋💋💋</div>
+    </div>
+
+  </div>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const buttons = document.getElementById("buttons");
+    const hint = document.getElementById("hint");
+
+    const questionScreen = document.getElementById("questionScreen");
+    const finalScreen = document.getElementById("finalScreen");
+
+    let noScale = 1;
+    let noTries = 0;
+    let noGone = false;
+
+    function moveNoRandom() {
+      const maxX = buttons.clientWidth - noBtn.offsetWidth;
+      const maxY = buttons.clientHeight - noBtn.offsetHeight;
+
+      const x = Math.floor(Math.random() * Math.max(1, maxX));
+      const y = Math.floor(Math.random() * Math.max(1, maxY));
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+
+    function shrinkNo() {
+      if (noGone) return;
+
+      noTries++;
+      noScale *= 0.78;
+      noBtn.style.transform = `scale(${noScale})`;
+
+      if (noTries === 2) hint.textContent = "Серьёзно? 🙃";
+      if (noTries === 4) hint.textContent = "Он уже почти сдался… 😅";
+      if (noTries === 6) hint.textContent = "Окей, он исчезнет 👀";
+
+      if (noScale < 0.22) {
+        noGone = true;
+        noBtn.style.opacity = "0";
+        noBtn.style.pointerEvents = "none";
+        hint.textContent = "Ладно… “Нет” больше нет 😇";
+      }
+    }
+
+    noBtn
+
+
+addEventListener("mouseenter", () => {
+      moveNoRandom();
+      shrinkNo();
+    });
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoRandom();
+      shrinkNo();
+    });
+
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = Math.random() > 0.5 ? "💖" : "💘";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.fontSize = (16 + Math.random() * 26) + "px";
+
+      document.body.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 3000);
+    }
+
+    function startHearts(durationMs = 5000) {
+      const interval = setInterval(createHeart, 120);
+      setTimeout(() => clearInterval(interval), durationMs);
+    }
+
+    yesBtn.addEventListener("click", () => {
+      // запускаем сердечки
+      startHearts(6000);
+
+      // показываем финальный экран
+      questionScreen.style.display = "none";
+      finalScreen.style.display = "block";
+    });
+  </script>
+
+</body>
+</html>.
